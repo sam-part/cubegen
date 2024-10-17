@@ -32,9 +32,9 @@ pub trait Component {
         Ok(())
     }
 
-    // fn list_commands(&self) -> Vec<CommandInfo>;
-}
+    fn draw(&mut self, _frame: &mut Frame, _area: Rect) -> Result<()> {
+        Ok(())
+    }
 
-pub trait DrawableComponent {
-    fn draw(&mut self, frame: &mut Frame, area: Rect) -> Result<()>;
+    // fn list_commands(&self) -> Vec<CommandInfo>;
 }
