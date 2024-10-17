@@ -3,8 +3,13 @@ use std::io::Stdout;
 use color_eyre::eyre::Result;
 use ratatui::{crossterm, prelude::CrosstermBackend, widgets::Paragraph, Terminal};
 
+pub mod app;
+pub mod command;
+pub mod components;
 pub mod event;
-use event::{EventHandler, Message};
+pub mod timer;
+
+use event::{Event, EventHandler};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -34,10 +39,10 @@ async fn run(mut terminal: Tui, mut event_handler: event::EventHandler) -> Resul
             frame.render_widget(Paragraph::new(message), frame.area());
         })?;
 
-        let message = event_handler.next().await?;
+        let event = event_handler.next().await?;
 
-        match message {
-            Message::Key(key) => {
+        match event {
+            Event::Key(key) => {
                 if key.kind == crossterm::event::KeyEventKind::Press {
                     if key.code == crossterm::event::KeyCode::Char('q') {
                         break;
@@ -49,7 +54,7 @@ async fn run(mut terminal: Tui, mut event_handler: event::EventHandler) -> Resul
                 }
             }
 
-            Message::Tick => counter += 1,
+            Event::Tick => counter += 1,
 
             _ => {}
         }
