@@ -4,10 +4,10 @@ use color_eyre::eyre::Result;
 use ratatui::{crossterm, prelude::CrosstermBackend, widgets::Paragraph, Terminal};
 
 pub mod app;
+pub mod clock;
 pub mod command;
 pub mod components;
 pub mod event;
-pub mod timer;
 
 use event::{Event, EventHandler};
 
