@@ -1,4 +1,4 @@
-use color_eyre::eyre::{eyre, Result};
+use color_eyre::eyre::{eyre, Report, Result};
 use crossterm::{
     self,
     event::{Event as CrosstermEvent, EventStream},
@@ -6,16 +6,17 @@ use crossterm::{
 use futures::{future::FutureExt, StreamExt};
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 
-pub enum Message {
+pub enum Event {
     Key(crossterm::event::KeyEvent),
     Mouse(crossterm::event::MouseEvent),
     Resize(u16, u16),
-    Error(std::io::Error),
+    Error(Report),
     Tick,
 }
 
 pub struct EventHandler {
-    rx: UnboundedReceiver<Message>,
+    tx: UnboundedSender<Event>,
+    rx: UnboundedReceiver<Event>,
 }
 
 impl EventHandler {
@@ -24,6 +25,7 @@ impl EventHandler {
         let mut tick_interval = tokio::time::interval(tick_period);
 
         let (tx, rx) = unbounded_channel();
+        let _tx = tx.clone();
 
         tokio::spawn(async move {
             let mut reader = EventStream::new();
@@ -32,9 +34,9 @@ impl EventHandler {
                 let next_event = reader.next().fuse();
 
                 tokio::select! {
-                    // Send a tick message at regular intervals
+                    // Send a tick event at regular intervals
                     _ = tick_interval.tick() => {
-                        tx.send(Message::Tick).unwrap();
+                        tx.send(Event::Tick).unwrap();
                     },
 
                     // If a crossterm event is received, handle it accordingly
@@ -45,10 +47,14 @@ impl EventHandler {
             }
         });
 
-        EventHandler { rx }
+        EventHandler { tx: _tx, rx }
     }
 
-    pub async fn next(&mut self) -> Result<Message> {
+    pub fn send(&self, event: Event) {
+        self.tx.send(event).unwrap();
+    }
+
+    pub async fn next(&mut self) -> Result<Event> {
         self.rx
             .recv()
             .await
@@ -61,24 +67,28 @@ impl EventHandler {
 /// * `tx`: The event handler's send interface
 fn handle_crossterm_event(
     event: Option<Result<CrosstermEvent, std::io::Error>>,
-    tx: &UnboundedSender<Message>,
+    tx: &UnboundedSender<Event>,
 ) {
     match event {
         // Event received
         Some(Ok(event)) => match event {
             CrosstermEvent::Key(key) => {
-                tx.send(Message::Key(key)).unwrap();
+                tx.send(Event::Key(key)).unwrap();
             }
 
             CrosstermEvent::Resize(width, height) => {
-                tx.send(Message::Resize(width, height)).unwrap();
+                tx.send(Event::Resize(width, height)).unwrap();
+            }
+
+            CrosstermEvent::Mouse(mouse) => {
+                tx.send(Event::Mouse(mouse)).unwrap();
             }
 
             _ => {}
         },
 
         // Error received
-        Some(Err(err)) => tx.send(Message::Error(err)).unwrap(),
+        Some(Err(err)) => tx.send(Event::Error(err.into())).unwrap(),
 
         _ => {}
     }
