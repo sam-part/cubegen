@@ -9,6 +9,5 @@ color-eyre = "0.6.3"
 futures = "0.3.31"
 crossterm = {version = "0.28.1", features = ["event-stream"]}
 tokio = {version = "1.40.0", features = ["full"]}
-
-[profile.dev.package.backtrace]
-opt-level = 3
+serde = "1.0.216"
+toml_edit = "0.22.22"
