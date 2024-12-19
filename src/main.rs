@@ -4,6 +4,7 @@ pub mod app;
 pub mod clock;
 pub mod components;
 pub mod event;
+pub mod input;
 
 use app::App;
 
