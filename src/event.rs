@@ -39,9 +39,11 @@ impl EventHandler {
                         tx.send(Event::Tick).unwrap();
                     },
 
-                    // If a crossterm event is received, handle it accordingly
+                    // If a crossterm event is received, handle it accordingly as long as the sender is not closed
                     event = next_event => {
-                        handle_crossterm_event(event, &tx)
+                        if !tx.is_closed() {
+                            handle_crossterm_event(event, &tx);
+                        }
                     }
                 }
             }
