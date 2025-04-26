@@ -3,8 +3,8 @@ use color_eyre::eyre::Result;
 use crossterm::event::{KeyEvent, MouseEvent};
 use ratatui::{layout::Rect, Frame};
 
-/// A component is a visual and interactive element of the UI.
-/// Managed and updated by the main application loop
+/// A component is a distinct visual and interactive element of the application.
+/// Managed and updated by the main application loop.
 pub trait Component {
     fn init(&mut self) -> Result<()> {
         Ok(())

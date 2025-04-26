@@ -31,6 +31,7 @@ impl App {
         App::default()
     }
 
+    /// Start the application and run the main loop.
     pub async fn run(&mut self) -> Result<()> {
         self.terminal.clear()?;
         self.running = true;
@@ -42,6 +43,7 @@ impl App {
         result
     }
 
+    /// Runs the main loop of the application indefinitely.
     async fn main_loop(&mut self) -> Result<()> {
         while self.running {
             let event = self.event_handler.next().await?;
@@ -52,6 +54,8 @@ impl App {
         Ok(())
     }
 
+    /// Handles an event, dispatching appropriately to the app's components.
+    /// * `event`: The event to be handled
     fn handle_event(&mut self, event: Event) -> Result<()> {
         match event {
             Event::Key(key_event) => {
@@ -88,6 +92,7 @@ impl App {
         Ok(())
     }
 
+    /// Attempts to draw each component to the terminal.
     fn draw(&mut self) -> Result<()> {
         self.terminal.draw(|frame| {
             for component in self.components.iter_mut() {

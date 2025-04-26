@@ -39,7 +39,7 @@ impl EventHandler {
                         tx.send(Event::Tick).unwrap();
                     },
 
-                    // If a crossterm event is received, handle it accordingly as long as the sender is not closed
+                    // If a crossterm event is received, handle it accordingly as long as the channel is not closed
                     event = next_event => {
                         if !tx.is_closed() {
                             handle_crossterm_event(event, &tx);
@@ -52,10 +52,15 @@ impl EventHandler {
         EventHandler { tx: _tx, rx }
     }
 
+    /// Sends an event to the EventHandler
+    /// * `event`: The event to send
     pub fn send(&self, event: Event) {
         self.tx.send(event).unwrap();
     }
 
+    /// Retrieves the next event asynchronously.
+    ///
+    /// Returns the next `Event`, or an error if the channel is closed.
     pub async fn next(&mut self) -> Result<Event> {
         self.rx
             .recv()
@@ -64,9 +69,9 @@ impl EventHandler {
     }
 }
 
-/// Helper function to handle a crossterm event
+/// Handles a crossterm event and sends it to the EventHandler's event channel.
 /// * `event`: The optional event returned by EventStream::next()
-/// * `tx`: The event handler's send interface
+/// * `tx`: The EventHandler's send interface
 fn handle_crossterm_event(
     event: Option<Result<CrosstermEvent, std::io::Error>>,
     tx: &UnboundedSender<Event>,

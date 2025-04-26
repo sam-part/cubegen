@@ -24,14 +24,9 @@ pub enum Action {
 
 pub type RawKeyBindings = HashMap<Action, Vec<String>>;
 
-// A bidirectional mapping of all (action, KeyEvent) pairs
-// Will be used in the future with the config to allow editable KeyEvents
-pub struct ActionMap {
-    action_to_keys: HashMap<Action, Vec<KeyEvent>>,
-    key_to_action: HashMap<KeyEvent, Action>,
-}
-
-pub fn parse_keybind(binding: &str) -> Option<KeyEvent> {
+/// Parses a single raw keybinding, returning its associated KeyEvent if valid.
+/// * `binding`: Raw keybinding represented as a string
+fn parse_keybind(binding: &str) -> Option<KeyEvent> {
     let mut code: Option<KeyCode> = None;
     let mut modifiers = KeyModifiers::NONE;
     let mut kind = KeyEventKind::Press;
@@ -102,11 +97,20 @@ pub fn parse_keybind(binding: &str) -> Option<KeyEvent> {
     code.map(|code| KeyEvent::new_with_kind(code, modifiers, kind))
 }
 
+/// A bidirectional mapping of all (action, KeyEvent) pairs.
+/// Will be used in the future with the config to allow editable KeyEvents.
+pub struct ActionMap {
+    action_to_keys: HashMap<Action, Vec<KeyEvent>>,
+    key_to_action: HashMap<KeyEvent, Action>,
+}
+
 impl ActionMap {
     pub fn action(&self, key_event: KeyEvent) -> Option<&Action> {
         self.key_to_action.get(&key_event)
     }
 
+    /// Creates an ActionMap from raw keybinds.
+    /// * `raw_bindings`: Map of actions to keybind strings.
     pub fn from_raw_bindings(raw_bindings: &RawKeyBindings) -> Self {
         let mut action_to_keys: HashMap<Action, Vec<KeyEvent>> = HashMap::new();
         let mut key_to_action: HashMap<KeyEvent, Action> = HashMap::new();
@@ -131,7 +135,7 @@ impl ActionMap {
     }
 }
 
-// Default KeyEvents
+// Default key bindings
 impl Default for ActionMap {
     fn default() -> Self {
         ActionMap::from_raw_bindings(&HashMap::from([
