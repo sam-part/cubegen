@@ -1,6 +1,7 @@
 use crate::{
     components::{component::Component, timer::TimerComponent},
     event::{Event, EventHandler},
+    input::{Action, ActionMap},
 };
 use color_eyre::eyre::{eyre, Result};
 use ratatui::{prelude::CrosstermBackend, Terminal};
@@ -12,16 +13,18 @@ pub struct App {
     event_handler: EventHandler,
     components: Vec<Box<dyn Component>>,
     terminal: Tui,
+    action_map: ActionMap,
 }
 
 impl Default for App {
     fn default() -> Self {
         Self {
             // TODO: get tickrate from config
-            event_handler: EventHandler::new(10.0),
+            event_handler: EventHandler::new(20.0),
             running: false,
             components: vec![Box::new(TimerComponent::new())],
             terminal: ratatui::init(),
+            action_map: ActionMap::default(),
         }
     }
 }
@@ -59,20 +62,21 @@ impl App {
     fn handle_event(&mut self, event: Event) -> Result<()> {
         match event {
             Event::Key(key_event) => {
-                if key_event.kind == crossterm::event::KeyEventKind::Press
-                    && key_event.code == crossterm::event::KeyCode::Char('q')
-                {
-                    self.running = false;
-                }
+                if let Some(action) = self.action_map.get_action(key_event) {
+                    if *action == Action::Quit {
+                        self.running = false;
+                        return Ok(());
+                    }
 
-                for component in self.components.iter_mut() {
-                    component.handle_key_event(key_event)?;
+                    for component in self.components.iter_mut() {
+                        component.handle_action(action)?;
+                    }
                 }
             }
 
             Event::Mouse(mouse_event) => {
                 for component in self.components.iter_mut() {
-                    component.handle_mouse_event(mouse_event)?;
+                    component.handle_mouse_event(mouse_event, &self.action_map)?;
                 }
             }
 

@@ -1,6 +1,7 @@
 use crate::event::Event;
+use crate::input::{Action, ActionMap};
 use color_eyre::eyre::Result;
-use crossterm::event::{KeyEvent, MouseEvent};
+use crossterm::event::MouseEvent;
 use ratatui::{layout::Rect, Frame};
 
 /// A component is a distinct visual and interactive element of the application.
@@ -14,21 +15,20 @@ pub trait Component {
         Ok(())
     }
 
-    fn handle_event(&mut self, event: Event) -> Result<()> {
+    fn handle_event(&mut self, event: Event, action_map: &ActionMap) -> Result<()> {
         match event {
-            Event::Key(key_event) => self.handle_key_event(key_event),
-            Event::Mouse(mouse_event) => self.handle_mouse_event(mouse_event),
+            Event::Mouse(mouse_event) => self.handle_mouse_event(mouse_event, action_map),
             Event::Tick => self.update(),
 
             _ => Ok(()),
         }
     }
 
-    fn handle_key_event(&mut self, _event: KeyEvent) -> Result<()> {
+    fn handle_action(&mut self, _action: &Action) -> Result<()> {
         Ok(())
     }
 
-    fn handle_mouse_event(&mut self, _event: MouseEvent) -> Result<()> {
+    fn handle_mouse_event(&mut self, _event: MouseEvent, _action_map: &ActionMap) -> Result<()> {
         Ok(())
     }
 

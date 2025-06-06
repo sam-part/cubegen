@@ -17,9 +17,8 @@ pub enum Action {
     Enter,
     Exit,
 
-    TimerStart,
+    TimerToggle,
     TimerStartRelease,
-    TimerStop,
 }
 
 pub type RawKeyBindings = HashMap<Action, Vec<String>>;
@@ -105,7 +104,7 @@ pub struct ActionMap {
 }
 
 impl ActionMap {
-    pub fn action(&self, key_event: KeyEvent) -> Option<&Action> {
+    pub fn get_action(&self, key_event: KeyEvent) -> Option<&Action> {
         self.key_to_action.get(&key_event)
     }
 
@@ -144,9 +143,8 @@ impl Default for ActionMap {
             (Action::Right, string_vec!["right", "l"]),
             (Action::Up, string_vec!["up", "k"]),
             (Action::Down, string_vec!["down", "j"]),
-            (Action::TimerStart, string_vec!["space"]),
+            (Action::TimerToggle, string_vec!["space"]),
             (Action::TimerStartRelease, string_vec!["release:space"]),
-            (Action::TimerStop, string_vec!["space"]),
         ]))
     }
 }
