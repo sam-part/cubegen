@@ -4,7 +4,6 @@ use std::time::{Duration, Instant};
 #[derive(Default)]
 pub struct Clock {
     start: Option<Instant>,
-    elapsed: Duration,
     active: bool,
 }
 
@@ -24,23 +23,22 @@ impl Clock {
     }
 
     /// Stops the clock (if running) and records the elapsed time.
-    pub fn stop(&mut self) {
-        if !self.active {
-            return;
-        }
-
-        if let Some(start) = self.start {
-            self.elapsed = start.elapsed();
-            self.start = None;
-        }
+    pub fn stop(&mut self) -> Duration {
+        let elapsed = self.elapsed();
 
         self.active = false;
         self.start = None;
+
+        elapsed
     }
 
     /// Returns the clock's elapsed time.
     pub fn elapsed(&self) -> Duration {
-        self.elapsed
+        if let Some(start) = self.start {
+            return start.elapsed();
+        }
+
+        Duration::default()
     }
 
     pub fn is_running(&self) -> bool {
