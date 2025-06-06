@@ -42,4 +42,8 @@ impl Clock {
     pub fn elapsed(&self) -> Duration {
         self.elapsed
     }
+
+    pub fn is_running(&self) -> bool {
+        self.active
+    }
 }
