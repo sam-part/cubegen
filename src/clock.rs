@@ -22,7 +22,7 @@ impl Clock {
         self.active = true;
     }
 
-    /// Stops the clock (if running) and records the elapsed time.
+    /// Stops the clock (if running).
     pub fn stop(&mut self) -> Duration {
         let elapsed = self.elapsed();
 

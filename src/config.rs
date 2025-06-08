@@ -18,6 +18,9 @@ pub struct AppConfig {
     pub timer: TimerConfig,
 }
 impl AppConfig {
+    /// Loads the application's configuration file.
+    /// First searches for a valid, standard location (dependent on OS).
+    /// If not found, will create a config file and load default values.
     pub fn load() -> Result<Self> {
         if let Some(project_dirs) = ProjectDirs::from("", "", "cubegen") {
             let config_path = project_dirs.config_dir().join("config.toml");
