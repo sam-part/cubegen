@@ -1,0 +1,15 @@
+# How many times per second the application updates and draws.
+# Note that this setting does not affect the accuracy of timing.
+tickrate = 20
+
+[timer]
+# If enabled, the timer will not start until the space bar is held down for a given time and released.
+# Disabled by default due to limitations of most terminals.
+# This is supported on the following terminals: kitty, foot, WezTerm, alacritty.
+use_key_release = false
+
+# How long the space bar must be held before the timer can start.
+freeze_time = 0.2
+
+# How many decimal points to show on the timer display
+display_decimal_points = 2
