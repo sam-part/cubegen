@@ -7,9 +7,16 @@ const DEFAULT_CONFIG: &str = include_str!("../default-config.toml");
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TimerConfig {
+    /// If enabled, the timer will not start until the space bar is held down for a given time and released.
+    /// Disabled by default due to limitations of most terminals.
+    /// This is supported on the following terminals: kitty, foot, WezTerm, alacritty.
     pub use_key_release: bool,
+
+    /// How long the space bar must be held before the timer can start (in seconds)
     pub freeze_time: f64,
-    pub display_decimal_points: u32,
+
+    /// How many decimal points to show on the timer display
+    pub display_decimal_points: usize,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
